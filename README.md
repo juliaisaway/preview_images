@@ -1,4 +1,4 @@
-#PREVIEW IMAGES
+# PREVIEW IMAGES
 
 Página em PHP para pré visualização de layouts em JPG ou PNG, para aprovação do mesmo
 
