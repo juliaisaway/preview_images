@@ -1,11 +1,15 @@
 <?php
     // Pega o valor da URL ativa
-    $url = (isset($_GET['url']))? $_GET['url']:'';
+    $url = (isset($_GET['url']))?$_GET['url']:'';
     $url = explode('/', $url);
     $page = strtolower($url[0]);
 
+    if(isset($page) && ($page == "" || !file_exists($page)))
+        $page = "default";
+
+
     // Busca as imagens, cria uma array com as mesmas e contabiliza-as
-    $images = array_map('basename', glob($url[0].'/'."*.{jpg,gif,png}", GLOB_BRACE));
+    $images = array_map('basename', glob($page.'/'."*.{jpg,gif,png}", GLOB_BRACE));
     $pg = (isset($_GET["pag"]))?$_GET["pag"]:1;
     $link = (count($images) < ($pg+1))?1:$pg+1;
 
@@ -24,7 +28,7 @@
         <?php foreach($images as $key => $row) {
 
             // Pega o tamanho de cada imagem
-            list($width, $height) = getimagesize(dirname(__FILE__).'/'.$url[0].'/'.$row);
+            list($width, $height) = getimagesize(dirname(__FILE__).'/'.$page.'/'.$row);
 
             // Pega a proporção de cada imagem
             $ratio = $width / $height;
@@ -35,7 +39,7 @@
             $code = <<<EOT
             
         .c{$new_key} {
-            background-image:url("{$row}");background-size: cover;
+            background-image:url("http://{$_SERVER['HTTP_HOST']}/preview/{$page}/{$row}");background-size: cover;
         }
         .c{$new_key}::before {
             content: '';
