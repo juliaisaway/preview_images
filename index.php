@@ -21,10 +21,6 @@
     <title>Ilton.me - Preview - Página <?= $pg.' de '.count($images) ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap-grid.min.css">
     <style type="text/css">
-        body{margin:0; border:0; padding:0;width:100%}
-
-        .fundo{background:top center no-repeat}
-
         <?php foreach($images as $key => $row) {
 
             // Pega o tamanho de cada imagem
@@ -35,49 +31,67 @@
             $percentage = 1 / $ratio * 100;
             $new_key = $key + 1;
 
-            // Gera o CSS para cada imagem
-            $code = <<<EOT
-            
-        .c{$new_key} {
-            background-image:url("http://{$_SERVER['HTTP_HOST']}/preview/{$page}/{$row}");background-size: cover;
-        }
-        .c{$new_key}::before {
-            content: '';
-            float: left;
-            padding-bottom: {$percentage}%;
-            margin-right: -100%;
-        }
-        .c{$new_key}::after {
-            content: '';
-            display: table;
-            clear: both;
-        }
-EOT;
+            // Gera o CSS para cada imagem com tamanho de porcentagem
+            $code = <<<CODE
+
+        .c{$new_key} {background-image:url("http://{$_SERVER['HTTP_HOST']}/preview/{$page}/{$row}");background-size:cover;}
+        .c{$new_key}::before{content:'';float: left;padding-bottom: {$percentage}%;margin-right: -100%;}
+        .c{$new_key}::after{content:'';display:table;clear:both;}
+        .f{$new_key} {background-image:url("http://{$_SERVER['HTTP_HOST']}/preview/{$page}/{$row}");height:{$height}px;}
+CODE;
 
             echo $code;
             echo "\n";
            }
         ?>
 
-        a,a:hover{text-decoration:none;}
+        body{margin:0; border:0; padding:0;width:100%}
+
+        a,a:hover,a:focus,a:active{text-decoration:none;color:inherit;}
+
+        .fundo{background-position:top center;background-repeat:no-repeat};
+
+        #resolution{cursor:pointer;}
 
         #fixa{position:relative;padding:5px;color:#000;font:12px Arial;background:#fff;border:1px solid #ccc;opacity:0.7;text-align:center;}
+
     </style>
 </head>
 <body>
-<a href="?pag=<?= $link ?>" title="">
 
 	<div id="fixa">
 		<div class="container">
 			<div class="row justify-content-between">
 				<span>Site melhor visualizado em resolução 1920x1080</span>
+				<span id="resolution" onclick="resolution()">Ver em resolução original</span>
 				<span>Clique na tela para alterar a página</span>
 			</div>
 		</div>
 	</div>
 
-    <div class="c<?= $pg ?> fundo"></div>
+	<a href="?pag=<?= $link ?>" title="">
+	    <div id="page" class="c<?= $pg ?> fundo"></div>
+	</a>
 
-</a>
+
+    <script>
+        function resolution() {
+            var element = document.getElementById("page");
+
+            if (element.classList) { 
+                element.classList.toggle("f<?= $pg ?>");
+                document.getElementById("resolution").textContent="Ver em resolução proporcional";
+            } else {
+                var classes = element.className.split(" ");
+                var i = classes.indexOf("f<?= $pg ?>");
+                if (i >= 0) 
+                    classes.splice(i, 1);
+                else 
+                    classes.push("f<?= $pg ?>");
+                    element.className = classes.join(" ");
+            }
+        }
+    </script>
+
 </body>
 </html>
